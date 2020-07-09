@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Assets\Character\AnimationController.cs" />
     <Compile Include="Assets\Character\Camera.cs" />
+    <Compile Include="Assets\Character\GrapplingHook.cs" />
     <Compile Include="Assets\Character\MovementBasic.cs" />
     <Compile Include="Assets\Character\MovementPhysics.cs" />
     <Compile Include="Assets\Character\Protagonist.cs" />

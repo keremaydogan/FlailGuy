@@ -26,20 +26,24 @@ public class MovementBasic : MonoBehaviour
     private float runCoeff;
 
     public float jumpForce;
+    //[SerializeField] private float jumpForceMax;
+    [SerializeField] bool jumpInput;
 
     Transform skin;
     Transform weapon;
 
 
-    void Start()
+    private void Awake()
     {
         mp = GetComponent<MovementPhysics>();
         rb = GetComponent<Rigidbody2D>();
 
         skin = transform.Find("Skin");
         weapon = transform.Find("Weapon");
-        weapon.gameObject.SetActive(false);
+
+        //jumpForce = jumpForceMax;
     }
+
 
     void Update()
     {
@@ -55,16 +59,23 @@ public class MovementBasic : MonoBehaviour
         velocityX = rb.velocity.x;
         
         HorizontalMove();
+
+        Jump();
     }
 
     void Inputs()
     {
         horInput = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButton("Jump") && !Input.GetButton("Down") && isGrounded)
         {
-            Jump();
+            jumpInput = true;
         }
+        //else if (Input.GetButtonUp("Jump") || rb.velocity.y < 0)
+        //{
+        //    jumpInput = false;
+        //    jumpForce = jumpForceMax;
+        //}
     }
 
     void HorizontalMove()
@@ -99,10 +110,21 @@ public class MovementBasic : MonoBehaviour
 
     void Jump()
     {
-        if (isGrounded && !Input.GetButton("Down"))
+        if (jumpInput)
         {
             rb.AddForce(Vector2.up * jumpForce * rb.mass);
+            jumpInput = false;
         }
+
+        //if (jumpInput)
+        //{
+        //    jumpForce = jumpForce / 1.2F;
+        //}
+
+        //if(jumpForce < 50)
+        //{
+        //    jumpForce = 0;
+        //}
     }
     void Turn()
     {

@@ -20,7 +20,7 @@ public class MovementPhysics : MonoBehaviour
     public float hInput => horInput;
 
     public LayerMask layers;
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         mb = GetComponent<MovementBasic>();

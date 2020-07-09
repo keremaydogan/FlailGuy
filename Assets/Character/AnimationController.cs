@@ -20,7 +20,7 @@ public class AnimationController : MonoBehaviour
     Transform skin;
     Transform weapon;
 
-    private void Start()
+    private void Awake()
     {
         anim = GetComponent<Animator>();
         mp = GetComponent<MovementPhysics>();

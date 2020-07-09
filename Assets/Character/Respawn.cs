@@ -8,7 +8,7 @@ public class Respawn : MonoBehaviour
     public float minY;
     Rigidbody2D rb;
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         spawnPose = transform.position;

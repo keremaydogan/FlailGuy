@@ -13,7 +13,7 @@ public class Camera : MonoBehaviour
     float getKeyCounter;
 
     float verInput;
-    private void Start()
+    private void Awake()
     {
         targetPosi.z = -10;
     }
