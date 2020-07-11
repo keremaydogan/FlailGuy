@@ -59,23 +59,16 @@ public class MovementBasic : MonoBehaviour
         velocityX = rb.velocity.x;
         
         HorizontalMove();
-
-        Jump();
     }
 
     void Inputs()
     {
         horInput = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetButton("Jump") && !Input.GetButton("Down") && isGrounded)
+        if (Input.GetButtonDown("Jump") && !Input.GetButton("Down") && isGrounded)
         {
-            jumpInput = true;
+            Jump();
         }
-        //else if (Input.GetButtonUp("Jump") || rb.velocity.y < 0)
-        //{
-        //    jumpInput = false;
-        //    jumpForce = jumpForceMax;
-        //}
     }
 
     void HorizontalMove()
@@ -110,21 +103,7 @@ public class MovementBasic : MonoBehaviour
 
     void Jump()
     {
-        if (jumpInput)
-        {
-            rb.AddForce(Vector2.up * jumpForce * rb.mass);
-            jumpInput = false;
-        }
-
-        //if (jumpInput)
-        //{
-        //    jumpForce = jumpForce / 1.2F;
-        //}
-
-        //if(jumpForce < 50)
-        //{
-        //    jumpForce = 0;
-        //}
+        rb.AddForce(Vector2.up * jumpForce * rb.mass);
     }
     void Turn()
     {
