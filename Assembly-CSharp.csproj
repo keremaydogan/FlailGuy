@@ -63,13 +63,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Character\AnimationController.cs" />
-    <Compile Include="Assets\Character\Camera.cs" />
-    <Compile Include="Assets\Character\GrapplingHook.cs" />
-    <Compile Include="Assets\Character\MovementBasic.cs" />
-    <Compile Include="Assets\Character\MovementPhysics.cs" />
-    <Compile Include="Assets\Character\Protagonist.cs" />
-    <Compile Include="Assets\Character\Respawn.cs" />
+    <Compile Include="Assets\Character\Scripts\AnimationController.cs" />
+    <Compile Include="Assets\Character\Scripts\Camera.cs" />
+    <Compile Include="Assets\Character\Scripts\GrapplingHook.cs" />
+    <Compile Include="Assets\Character\Scripts\MovementBasic.cs" />
+    <Compile Include="Assets\Character\Scripts\MovementPhysics.cs" />
+    <Compile Include="Assets\Character\Scripts\Protagonist.cs" />
+    <Compile Include="Assets\Character\Scripts\Respawn.cs" />
+    <Compile Include="Assets\DogGuy\EnemyDetection.cs" />
+    <Compile Include="Assets\DogGuy\PassiveMovement.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/kerus/UnityProjects/FlailGuy/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

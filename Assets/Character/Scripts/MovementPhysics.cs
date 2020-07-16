@@ -26,6 +26,8 @@ public class MovementPhysics : MonoBehaviour
         mb = GetComponent<MovementBasic>();
 
         fellCheck = true;
+
+        EnemyDetection.TargetPosition += GetPosition;
     }
 
     private void Update()
@@ -38,6 +40,11 @@ public class MovementPhysics : MonoBehaviour
         AutoBrake();
 
         IsGrounded();
+    }
+
+    Vector3 GetPosition()
+    {
+        return transform.localPosition;
     }
 
     void AutoBrake()
