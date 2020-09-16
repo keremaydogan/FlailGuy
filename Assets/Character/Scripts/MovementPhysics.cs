@@ -11,7 +11,7 @@ public class MovementPhysics : MonoBehaviour
     Rigidbody2D rb;
 
     [SerializeField] private bool groundCheck;
-    [SerializeField] private bool fellCheck;
+    public bool fellCheck;
     [SerializeField] private bool isGrounded;
 
     public bool grounded => isGrounded;
@@ -19,13 +19,18 @@ public class MovementPhysics : MonoBehaviour
     float horInput;
     public float hInput => horInput;
 
-    public LayerMask layers;
+    public LayerMask groundLayers;
+
+    RaycastHit2D slopeRay;
+    float slopeAngle;
+
+    float brakeForce = 150;
+    float brakeCoeff = 1;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         mb = GetComponent<MovementBasic>();
-
-        fellCheck = true;
 
         EnemyDetection.TargetPosition += GetPosition;
     }
@@ -40,25 +45,49 @@ public class MovementPhysics : MonoBehaviour
         AutoBrake();
 
         IsGrounded();
+
+        Slope();
+    }
+    
+    void Slope()
+    {
+        slopeRay = Physics2D.Raycast(transform.position, Vector3.down, 3, groundLayers);
+        Debug.Log(slopeRay.normal + " || degree: " + Vector3.Angle(Vector3.zero, new Vector3(slopeRay.normal.x, slopeRay.normal.y, 0)).ToString());
     }
 
     Vector3 GetPosition()
     {
-        return transform.localPosition;
+        return transform.position;
     }
-
     void AutoBrake()
     {
+        if (!mb.enabled)
+        {
+            brakeCoeff = 5;
+        }
+        else
+        {
+            brakeCoeff = 1;
+        }
         if (groundCheck && horInput == 0 && rb.velocity.x != 0)
         {
-            rb.AddForce(Vector2.right * rb.velocity * 150 * -1);
+            rb.AddForce(Vector2.right * rb.velocity * brakeForce * brakeCoeff * -1);
         }
     }
     void IsGrounded()
     {
-        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - 1.7F), 0.69F, layers);
+        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - 1.7F), 0.69F, groundLayers);
 
-        if(groundCheck && fellCheck)
+        if(fellCheck == false && rb.velocity.y < 0)
+        {
+            fellCheck = true;
+        }
+
+        //!!!!!!!!!
+        //fellcheck is public and used by MovementBasic. You may wanna make it private. 
+        //!!!!!!!!!
+
+        if (groundCheck && fellCheck)
         {
             isGrounded = true;
         }

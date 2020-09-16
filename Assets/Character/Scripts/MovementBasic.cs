@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 
 public class MovementBasic : MonoBehaviour
@@ -14,6 +15,7 @@ public class MovementBasic : MonoBehaviour
     [SerializeField] private bool isGrounded;
 
     [SerializeField] float velocityX;
+    [SerializeField] float velocityY;
 
     private float horInput;
 
@@ -25,13 +27,12 @@ public class MovementBasic : MonoBehaviour
     public float runConst; //Constant 
     private float runCoeff;
 
+
     public float jumpForce;
-    //[SerializeField] private float jumpForceMax;
     [SerializeField] bool jumpInput;
 
     Transform skin;
     Transform weapon;
-
 
     private void Awake()
     {
@@ -40,10 +41,7 @@ public class MovementBasic : MonoBehaviour
 
         skin = transform.Find("Skin");
         weapon = transform.Find("Weapon");
-
-        //jumpForce = jumpForceMax;
     }
-
 
     void Update()
     {
@@ -57,10 +55,10 @@ public class MovementBasic : MonoBehaviour
         isGrounded = mp.grounded;
 
         velocityX = rb.velocity.x;
-        
+        velocityY = rb.velocity.y;
+
         HorizontalMove();
     }
-
     void Inputs()
     {
         horInput = Input.GetAxisRaw("Horizontal");
@@ -104,6 +102,7 @@ public class MovementBasic : MonoBehaviour
     void Jump()
     {
         rb.AddForce(Vector2.up * jumpForce * rb.mass);
+        mp.fellCheck = false;
     }
     void Turn()
     {
@@ -118,4 +117,5 @@ public class MovementBasic : MonoBehaviour
             weapon.localScale = new Vector3(-1, 1, 1);
         }
     }
+
 }

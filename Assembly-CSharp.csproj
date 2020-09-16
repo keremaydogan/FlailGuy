@@ -65,13 +65,14 @@
   <ItemGroup>
     <Compile Include="Assets\Character\Scripts\AnimationController.cs" />
     <Compile Include="Assets\Character\Scripts\Camera.cs" />
-    <Compile Include="Assets\Character\Scripts\GrapplingHook.cs" />
     <Compile Include="Assets\Character\Scripts\MovementBasic.cs" />
     <Compile Include="Assets\Character\Scripts\MovementPhysics.cs" />
-    <Compile Include="Assets\Character\Scripts\Protagonist.cs" />
     <Compile Include="Assets\Character\Scripts\Respawn.cs" />
     <Compile Include="Assets\DogGuy\EnemyDetection.cs" />
-    <Compile Include="Assets\DogGuy\PassiveMovement.cs" />
+    <Compile Include="Assets\GameManager.cs" />
+    <Compile Include="Assets\Scripts\Character.cs" />
+    <Compile Include="Assets\Scripts\ICharacter.cs" />
+    <Compile Include="Assets\Scripts\InputManager.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>C:/Users/kerus/UnityProjects/FlailGuy/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

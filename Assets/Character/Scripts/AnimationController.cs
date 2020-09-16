@@ -9,6 +9,7 @@ public class AnimationController : MonoBehaviour
     Animator anim;
 
     float horInput;
+    public float hInput => horInput;
 
     [SerializeField] float currentDir;
     [SerializeField] float attackDir;
@@ -40,6 +41,11 @@ public class AnimationController : MonoBehaviour
         IsCrouching();
     }
 
+    private void FixedUpdate()
+    {
+        isGrounded = mp.grounded;
+    }
+
     void IsCrouching()
     {
         if (Input.GetButton("Down"))
@@ -50,19 +56,14 @@ public class AnimationController : MonoBehaviour
         {
             anim.SetBool("isCrouching", false);
         }
-        
     }
-    private void FixedUpdate()
-    {
-        isGrounded = mp.grounded;
-    }
+    
     void AttackTrigger()
     {
         if (Input.GetButtonDown("Attack"))
         {
             anim.SetTrigger("Attack");
             anim.ResetTrigger("OppositeAtk");
-            
         }
         if (detectCurDir)
         {

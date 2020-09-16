@@ -15,20 +15,21 @@ public class EnemyDetection : MonoBehaviour
     public static event GetPosition TargetPosition;
     Vector3 targetPos;
     
-    [SerializeField] bool targetDetected;
     [SerializeField] bool targetVisible;
     bool onTheWatch;
     [SerializeField] bool targetAround;
+    [SerializeField] bool targetDetected;
 
     private void FixedUpdate()
     {
-        targetPos = TargetPosition();
+        targetPos = TargetPosition() - transform.position;
         TargetDetection();
     }
 
     void TargetDetection()
     {
-        visibleZone = Physics2D.Raycast(transform.localPosition, targetPos - transform.localPosition, vzRange, vzLayers);
+
+        visibleZone = Physics2D.Raycast(transform.position, targetPos, vzRange, vzLayers);
         targetVisible = visibleZone.collider != null && (visibleZone.collider.tag == "Player");
 
         if (targetVisible)
@@ -38,7 +39,7 @@ public class EnemyDetection : MonoBehaviour
 
         if (onTheWatch)
         {
-            memoryZone = Physics2D.Raycast(transform.localPosition, targetPos - transform.localPosition, mzRange, mzLayers);
+            memoryZone = Physics2D.Raycast(transform.position, targetPos, mzRange, mzLayers);
             targetAround = memoryZone.collider != null && (memoryZone.collider.tag == "Player");
             if (!memoryZone)
             {
@@ -47,5 +48,6 @@ public class EnemyDetection : MonoBehaviour
         }
 
         targetDetected = targetVisible || targetAround;
+
     }
 }
