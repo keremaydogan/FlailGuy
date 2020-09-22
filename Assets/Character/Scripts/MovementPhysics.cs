@@ -10,9 +10,14 @@ public class MovementPhysics : MonoBehaviour
 
     Rigidbody2D rb;
 
+    CapsuleCollider2D bodyCollider;
+
     [SerializeField] private bool groundCheck;
     public bool fellCheck;
     [SerializeField] private bool isGrounded;
+
+    [SerializeField] private float bCOverCirCenter;
+    [SerializeField] private float bCOverCirRad;
 
     public bool grounded => isGrounded;
 
@@ -21,18 +26,26 @@ public class MovementPhysics : MonoBehaviour
 
     public LayerMask groundLayers;
 
-    RaycastHit2D slopeRay;
-    float slopeAngle;
+    private Vector2 moveDir;
+    public Vector2 movingDir => moveDir;
 
-    float brakeForce = 150;
+    RaycastHit2D slopeRay;
+    float slopeRayLen;
+    float slopeAngle;
+    public float maxSlopeAngle;
+
+    float brakeForce = 15;
     float brakeCoeff = 1;
 
     private void Awake()
     {
+        moveDir = Vector2.right;
+
         rb = GetComponent<Rigidbody2D>();
         mb = GetComponent<MovementBasic>();
+        bodyCollider = transform.Find("Body").GetComponent<CapsuleCollider2D>();
 
-        EnemyDetection.TargetPosition += GetPosition;
+        VariableCalc();
     }
 
     private void Update()
@@ -44,39 +57,51 @@ public class MovementPhysics : MonoBehaviour
     {
         AutoBrake();
 
-        IsGrounded();
+        Grounded();
 
         Slope();
     }
     
-    void Slope()
+    void VariableCalc()
     {
-        slopeRay = Physics2D.Raycast(transform.position, Vector3.down, 3, groundLayers);
-        Debug.Log(slopeRay.normal + " || degree: " + Vector3.Angle(Vector3.zero, new Vector3(slopeRay.normal.x, slopeRay.normal.y, 0)).ToString());
+        bCOverCirRad = bodyCollider.size.x / 2 - 0.01F;
+        bCOverCirCenter = (bodyCollider.size.y - bodyCollider.size.x) / 2 + 0.04F;
+
+        slopeRayLen = bodyCollider.size.y / 2 + 0.5F;
     }
 
-    Vector3 GetPosition()
+    void Slope()
     {
-        return transform.position;
+        slopeRay = Physics2D.Raycast(transform.position + (new Vector3(0.2F, 0) * horInput), Vector2.down, slopeRayLen, groundLayers);
+        slopeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(Vector2.up, slopeRay.normal);
+
+        if (isGrounded) {
+            moveDir.x = horInput * Mathf.Cos(slopeAngle);
+            moveDir.y = horInput * Mathf.Sin(slopeAngle);
+        }
+        else {
+            moveDir = horInput * Vector2.right;
+        }
     }
+
     void AutoBrake()
     {
-        if (!mb.enabled)
-        {
+        if (!mb.enabled) {
             brakeCoeff = 5;
         }
-        else
-        {
+        else {
             brakeCoeff = 1;
         }
+
         if (groundCheck && horInput == 0 && rb.velocity.x != 0)
         {
-            rb.AddForce(Vector2.right * rb.velocity * brakeForce * brakeCoeff * -1);
+            rb.AddForce(Vector2.right * rb.velocity * rb.mass * brakeForce * brakeCoeff * -1);
         }
     }
-    void IsGrounded()
+
+    void Grounded()
     {
-        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - 1.7F), 0.69F, groundLayers);
+        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter), bCOverCirRad, groundLayers);
 
         if(fellCheck == false && rb.velocity.y < 0)
         {
@@ -96,4 +121,10 @@ public class MovementPhysics : MonoBehaviour
             isGrounded = false;
         }
     }
+
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(25, 25, 100, 100), slopeAngle.ToString() + "\n" + moveDir.x +"\n" + moveDir.y);
+    }
+
 }

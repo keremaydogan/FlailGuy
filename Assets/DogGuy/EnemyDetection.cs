@@ -11,8 +11,6 @@ public class EnemyDetection : MonoBehaviour
     public LayerMask vzLayers;
     public LayerMask mzLayers;
 
-    public delegate Vector3 GetPosition();
-    public static event GetPosition TargetPosition;
     Vector3 targetPos;
     
     [SerializeField] bool targetVisible;
@@ -20,14 +18,30 @@ public class EnemyDetection : MonoBehaviour
     [SerializeField] bool targetAround;
     [SerializeField] bool targetDetected;
 
+    Collider2D[] contacts;
+
+    private void Awake()
+    {
+        contacts = new Collider2D[4];
+    }
+
     private void FixedUpdate()
     {
-        targetPos = TargetPosition() - transform.position;
         TargetDetection();
+    }
+
+    private void OnTriggerStay2D(Collider2D collision)
+    {
+        if(collision.tag == "Player")
+        {
+            collision.GetContacts(contacts);
+            targetPos = collision.gameObject.transform.position - transform.position;
+        }
     }
 
     void TargetDetection()
     {
+        Debug.DrawRay(transform.position, targetPos, Color.white);
 
         visibleZone = Physics2D.Raycast(transform.position, targetPos, vzRange, vzLayers);
         targetVisible = visibleZone.collider != null && (visibleZone.collider.tag == "Player");
@@ -48,6 +62,5 @@ public class EnemyDetection : MonoBehaviour
         }
 
         targetDetected = targetVisible || targetAround;
-
     }
 }

@@ -38,7 +38,7 @@ public class AnimationController : MonoBehaviour
 
         AttackTrigger();
 
-        IsCrouching();
+        Crouch();
     }
 
     private void FixedUpdate()
@@ -46,7 +46,7 @@ public class AnimationController : MonoBehaviour
         isGrounded = mp.grounded;
     }
 
-    void IsCrouching()
+    void Crouch()
     {
         if (Input.GetButton("Down"))
         {

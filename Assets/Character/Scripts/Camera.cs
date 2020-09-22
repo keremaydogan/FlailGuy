@@ -31,15 +31,11 @@ public class Camera : MonoBehaviour
     private void Update()
     {
         verInput = Input.GetAxisRaw("Vertical");
-
-        
     }
 
     void FollowTarget()
     {
         transform.position = Vector3.SmoothDamp(transform.position, targetPosi, ref velo, 0.1F);
-
-
     }
 
     void LookingVer()

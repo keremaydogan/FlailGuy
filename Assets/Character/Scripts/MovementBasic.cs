@@ -26,6 +26,7 @@ public class MovementBasic : MonoBehaviour
     public float crouchConst; 
     public float runConst; //Constant 
     private float runCoeff;
+    private Vector2 moveDir;
 
 
     public float jumpForce;
@@ -53,11 +54,14 @@ public class MovementBasic : MonoBehaviour
     private void FixedUpdate()
     {
         isGrounded = mp.grounded;
+        moveDir = mp.movingDir;
 
         velocityX = rb.velocity.x;
         velocityY = rb.velocity.y;
 
         HorizontalMove();
+
+        Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.red);
     }
     void Inputs()
     {
@@ -73,7 +77,7 @@ public class MovementBasic : MonoBehaviour
     {
         if(rb.velocity.x * horInput <= maxVelocity * runCoeff)
         {
-            rb.AddForce(Vector2.right  * walkForce * walkAirCoeff  * horInput * Time.deltaTime * rb.mass);
+            rb.AddForce(moveDir  * walkForce * walkAirCoeff * Time.deltaTime * rb.mass);
         }
 
         if (isGrounded && Input.GetButton("Down"))
@@ -117,5 +121,4 @@ public class MovementBasic : MonoBehaviour
             weapon.localScale = new Vector3(-1, 1, 1);
         }
     }
-
 }
