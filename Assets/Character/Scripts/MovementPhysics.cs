@@ -31,10 +31,11 @@ public class MovementPhysics : MonoBehaviour
 
     RaycastHit2D slopeRay;
     float slopeRayLen;
-    float slopeAngle;
+    float slopeAngleRad;
+    float slopeAngleDeg;
     public float maxSlopeAngle;
 
-    float brakeForce = 15;
+    float brakeForce = 40;
     float brakeCoeff = 1;
 
     private void Awake()
@@ -60,6 +61,10 @@ public class MovementPhysics : MonoBehaviour
         Grounded();
 
         Slope();
+
+        Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.green);
+        Debug.DrawLine(transform.position, new Vector3(0, moveDir.y) + transform.position, UnityEngine.Color.red);
+        Debug.DrawLine(transform.position, new Vector3(moveDir.x, 0) + transform.position, UnityEngine.Color.blue);
     }
     
     void VariableCalc()
@@ -73,11 +78,12 @@ public class MovementPhysics : MonoBehaviour
     void Slope()
     {
         slopeRay = Physics2D.Raycast(transform.position + (new Vector3(0.2F, 0) * horInput), Vector2.down, slopeRayLen, groundLayers);
-        slopeAngle = Mathf.Deg2Rad * Vector2.SignedAngle(Vector2.up, slopeRay.normal);
+        slopeAngleDeg = Vector2.SignedAngle(Vector2.up, slopeRay.normal);
+        slopeAngleRad = Mathf.Deg2Rad * slopeAngleDeg;
 
         if (isGrounded) {
-            moveDir.x = horInput * Mathf.Cos(slopeAngle);
-            moveDir.y = horInput * Mathf.Sin(slopeAngle);
+            moveDir.x = horInput * Mathf.Cos(slopeAngleRad);
+            moveDir.y = horInput * Mathf.Sin(slopeAngleRad);
         }
         else {
             moveDir = horInput * Vector2.right;
@@ -93,9 +99,8 @@ public class MovementPhysics : MonoBehaviour
             brakeCoeff = 1;
         }
 
-        if (groundCheck && horInput == 0 && rb.velocity.x != 0)
-        {
-            rb.AddForce(Vector2.right * rb.velocity * rb.mass * brakeForce * brakeCoeff * -1);
+        if (groundCheck && horInput == 0 && rb.velocity.x != 0) {
+            rb.AddForce(Vector2.left * rb.velocity * rb.mass * brakeForce * brakeCoeff);
         }
     }
 
@@ -124,7 +129,6 @@ public class MovementPhysics : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(25, 25, 100, 100), slopeAngle.ToString() + "\n" + moveDir.x +"\n" + moveDir.y);
+        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x +"\nSin (y): " + moveDir.y);
     }
-
 }

@@ -26,6 +26,7 @@ public class MovementBasic : MonoBehaviour
     public float crouchConst; 
     public float runConst; //Constant 
     private float runCoeff;
+    private float slopeCoeff;
     private Vector2 moveDir;
 
 
@@ -49,6 +50,8 @@ public class MovementBasic : MonoBehaviour
         Inputs();
 
         Turn();
+
+        SlopeCoeff();
     }
 
     private void FixedUpdate()
@@ -60,8 +63,6 @@ public class MovementBasic : MonoBehaviour
         velocityY = rb.velocity.y;
 
         HorizontalMove();
-
-        Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.red);
     }
     void Inputs()
     {
@@ -73,9 +74,14 @@ public class MovementBasic : MonoBehaviour
         }
     }
 
+    void SlopeCoeff()
+    {
+        slopeCoeff = 1 + -Mathf.Sign(moveDir.y) * (1 - Mathf.Abs(moveDir.x));
+    }
+
     void HorizontalMove()
     {
-        if(rb.velocity.x * horInput <= maxVelocity * runCoeff)
+        if(rb.velocity.x * horInput <= maxVelocity * runCoeff * slopeCoeff)
         {
             rb.AddForce(moveDir  * walkForce * walkAirCoeff * Time.deltaTime * rb.mass);
         }
@@ -105,8 +111,10 @@ public class MovementBasic : MonoBehaviour
 
     void Jump()
     {
-        rb.AddForce(Vector2.up * jumpForce * rb.mass);
         mp.fellCheck = false;
+        rb.velocity = new Vector2(rb.velocity.x, 0);
+        rb.AddForce(Vector2.up * jumpForce * rb.mass);
+        
     }
     void Turn()
     {
@@ -120,5 +128,11 @@ public class MovementBasic : MonoBehaviour
             skin.localScale = new Vector3(-1, 1, 1);
             weapon.localScale = new Vector3(-1, 1, 1);
         }
+    }
+
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(25, 100, 100, 125), "Sign(y): " + Mathf.Sign(moveDir.y) + "\nMaxVelocity: " + maxVelocity * runCoeff * slopeCoeff + "\nVelocity: " + velocityX);
+        //"SlopeCoeff: \n" + slopeCoeff
     }
 }
