@@ -29,13 +29,13 @@ public class MovementBasic : MonoBehaviour
     private float slopeCoeff;
     private Vector2 moveDir;
 
-
+    //public float jumpHeight;
     public float jumpForce;
-    [SerializeField] bool jumpInput;
+    [SerializeField] bool jumpInput = false;
+    bool jumpAllowed;
 
     Transform skin;
     Transform weapon;
-
     private void Awake()
     {
         mp = GetComponent<MovementPhysics>();
@@ -43,6 +43,8 @@ public class MovementBasic : MonoBehaviour
 
         skin = transform.Find("Skin");
         weapon = transform.Find("Weapon");
+
+        //VariableCalc();
     }
 
     void Update()
@@ -63,14 +65,26 @@ public class MovementBasic : MonoBehaviour
         velocityY = rb.velocity.y;
 
         HorizontalMove();
+
+        Jump();
     }
+
+    //void VariableCalc()
+    //{
+    //    jumpForce = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y));
+    //    jumpForce = rb.mass * Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y)) / Time.fixedDeltaTime;
+    //    Debug.Log("jf " + jumpForce + " " + Time.deltaTime + " " + Time.fixedDeltaTime);
+    //}
+
     void Inputs()
     {
         horInput = Input.GetAxisRaw("Horizontal");
 
-        if (Input.GetButtonDown("Jump") && !Input.GetButton("Down") && isGrounded)
+        if (jumpAllowed && Input.GetButtonDown("Jump") && !Input.GetButton("Down") && isGrounded)
         {
-            Jump();
+            jumpInput = true;
+            jumpAllowed = false;
+            mp.fellCheck = false;
         }
     }
 
@@ -111,10 +125,27 @@ public class MovementBasic : MonoBehaviour
 
     void Jump()
     {
-        mp.fellCheck = false;
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.AddForce(Vector2.up * jumpForce * rb.mass);
-        
+        if(isGrounded && !jumpAllowed && !Input.GetButtonUp("Jump"))
+        {
+            jumpAllowed = true;
+        }
+
+        if (jumpInput)
+        {
+            if (mp.fellCheck || !Input.GetButton("Jump"))
+            {
+                jumpInput = false;
+            }
+
+            //READ THERE READ THERE READ THERE READ THERE 
+            //button system is okay now but you need to find about leveling system
+
+            rb.AddForce(Vector2.up * jumpForce * rb.mass);
+
+            //mp.fellCheck = false;
+            //rb.velocity = new Vector2(rb.velocity.x, 0);
+            //rb.AddForce(Vector2.up * jumpForce * rb.mass);
+        }
     }
     void Turn()
     {
@@ -133,6 +164,5 @@ public class MovementBasic : MonoBehaviour
     private void OnGUI()
     {
         GUI.Label(new Rect(25, 100, 100, 125), "Sign(y): " + Mathf.Sign(moveDir.y) + "\nMaxVelocity: " + maxVelocity * runCoeff * slopeCoeff + "\nVelocity: " + velocityX);
-        //"SlopeCoeff: \n" + slopeCoeff
     }
 }

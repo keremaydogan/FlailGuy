@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Build;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MovementPhysics : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class MovementPhysics : MonoBehaviour
 
     Rigidbody2D rb;
 
-    CapsuleCollider2D bodyCollider;
+    CapsuleCollider2D bodyCol;
 
     [SerializeField] private bool groundCheck;
     public bool fellCheck;
@@ -31,6 +32,7 @@ public class MovementPhysics : MonoBehaviour
 
     RaycastHit2D slopeRay;
     float slopeRayLen;
+    float slopeRayCenter;
     float slopeAngleRad;
     float slopeAngleDeg;
     public float maxSlopeAngle;
@@ -38,13 +40,16 @@ public class MovementPhysics : MonoBehaviour
     float brakeForce = 40;
     float brakeCoeff = 1;
 
+    [SerializeField] bool landingDetect = false;
+    [SerializeField] bool landingTrigger;
+
     private void Awake()
     {
         moveDir = Vector2.right;
 
         rb = GetComponent<Rigidbody2D>();
         mb = GetComponent<MovementBasic>();
-        bodyCollider = transform.Find("Body").GetComponent<CapsuleCollider2D>();
+        bodyCol = transform.Find("Body").GetComponent<CapsuleCollider2D>();
 
         VariableCalc();
     }
@@ -62,22 +67,29 @@ public class MovementPhysics : MonoBehaviour
 
         Slope();
 
+        LandingStabilization();
+
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.green);
         Debug.DrawLine(transform.position, new Vector3(0, moveDir.y) + transform.position, UnityEngine.Color.red);
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, 0) + transform.position, UnityEngine.Color.blue);
+        Debug.DrawLine(transform.position + new Vector3(slopeRayCenter * horInput, 0), new Vector3(slopeRayCenter * horInput, -slopeRayLen) + transform.position, UnityEngine.Color.magenta);
+
     }
-    
+
     void VariableCalc()
     {
-        bCOverCirRad = bodyCollider.size.x / 2 - 0.01F;
-        bCOverCirCenter = (bodyCollider.size.y - bodyCollider.size.x) / 2 + 0.04F;
+        bCOverCirRad = bodyCol.size.x / 2 - 0.01F;
+        bCOverCirCenter = (bodyCol.size.y - bodyCol.size.x) / 2 + 0.04F;
 
-        slopeRayLen = bodyCollider.size.y / 2 + 0.5F;
+        slopeRayLen = bodyCol.size.y / 2 + 0.6F;
+        slopeRayCenter = 0.2F;
+
+        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter), bCOverCirRad, groundLayers);
     }
 
     void Slope()
     {
-        slopeRay = Physics2D.Raycast(transform.position + (new Vector3(0.2F, 0) * horInput), Vector2.down, slopeRayLen, groundLayers);
+        slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayCenter * horInput, 0), Vector2.down, slopeRayLen, groundLayers);
         slopeAngleDeg = Vector2.SignedAngle(Vector2.up, slopeRay.normal);
         slopeAngleRad = Mathf.Deg2Rad * slopeAngleDeg;
 
@@ -93,14 +105,34 @@ public class MovementPhysics : MonoBehaviour
     void AutoBrake()
     {
         if (!mb.enabled) {
-            brakeCoeff = 5;
+            brakeCoeff = 1.5F;
         }
         else {
             brakeCoeff = 1;
         }
 
-        if (groundCheck && horInput == 0 && rb.velocity.x != 0) {
+        if (isGrounded && horInput == 0 && rb.velocity.x != 0) {
             rb.AddForce(Vector2.left * rb.velocity * rb.mass * brakeForce * brakeCoeff);
+        }
+    }
+
+    //this looks weird with no animation but maybe it'll be okay with animation
+    //if you fall without jump it doesn't work
+    void LandingStabilization()
+    {
+        //if(detectLanding && groundCheck)
+        //{
+            
+        //}
+        if (landingDetect)
+        {
+            landingTrigger = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter - 0.5F), bCOverCirRad, groundLayers);
+        }
+        if (landingTrigger)
+        {
+            landingDetect = false;
+            landingTrigger = false;
+            rb.velocity = new Vector2(rb.velocity.x, 0);
         }
     }
 
@@ -111,6 +143,7 @@ public class MovementPhysics : MonoBehaviour
         if(fellCheck == false && rb.velocity.y < 0)
         {
             fellCheck = true;
+            landingDetect = true;
         }
 
         //!!!!!!!!!
