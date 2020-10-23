@@ -28,14 +28,15 @@ public class MovementBasic : MonoBehaviour
     private float runCoeff;
     private float slopeCoeff;
     private Vector2 moveDir;
-
-    //public float jumpHeight;
-    public float jumpForce;
-    [SerializeField] bool jumpInput = false;
+    
     bool jumpAllowed;
+    public float jumpHeight;
+    [SerializeField] bool jumpInput = false;
+    [SerializeField] float jumpVelo;
 
     Transform skin;
     Transform weapon;
+
     private void Awake()
     {
         mp = GetComponent<MovementPhysics>();
@@ -44,7 +45,12 @@ public class MovementBasic : MonoBehaviour
         skin = transform.Find("Skin");
         weapon = transform.Find("Weapon");
 
-        //VariableCalc();
+        AwakeCalc();
+    }
+
+    void AwakeCalc()
+    {
+        jumpVelo = Mathf.Sqrt(2 * Mathf.Abs(Physics2D.gravity.y) * rb.gravityScale * jumpHeight);
     }
 
     void Update()
@@ -69,19 +75,19 @@ public class MovementBasic : MonoBehaviour
         Jump();
     }
 
-    //void VariableCalc()
-    //{
-    //    jumpForce = Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y));
-    //    jumpForce = rb.mass * Mathf.Sqrt(2 * jumpHeight * Mathf.Abs(Physics2D.gravity.y)) / Time.fixedDeltaTime;
-    //    Debug.Log("jf " + jumpForce + " " + Time.deltaTime + " " + Time.fixedDeltaTime);
-    //}
-
     void Inputs()
     {
         horInput = Input.GetAxisRaw("Horizontal");
 
         if (jumpAllowed && Input.GetButtonDown("Jump") && !Input.GetButton("Down") && isGrounded)
         {
+            rb.velocity = new Vector2(rb.velocity.x, jumpVelo);
+
+
+            //jumpForceDynm = jumpForce;
+
+            //rb.velocity = new Vector2(rb.velocity.x, 0);
+
             jumpInput = true;
             jumpAllowed = false;
             mp.fellCheck = false;
@@ -100,25 +106,20 @@ public class MovementBasic : MonoBehaviour
             rb.AddForce(moveDir  * walkForce * walkAirCoeff * Time.deltaTime * rb.mass);
         }
 
-        if (isGrounded && Input.GetButton("Down"))
-        {
+        if (isGrounded && Input.GetButton("Down")) {
             runCoeff = crouchConst;
         }
-        else if (isGrounded && Input.GetButton("Run"))
-        {
+        else if (isGrounded && Input.GetButton("Run")) {
             runCoeff = runConst;
         }
-        else
-        {
+        else {
             runCoeff = 1;
         }
 
-        if (!isGrounded)
-        {
+        if (!isGrounded) {
             walkAirCoeff = walkAirConst;
         }
-        else
-        {
+        else {
             walkAirCoeff = 1;
         }
     }
@@ -140,11 +141,9 @@ public class MovementBasic : MonoBehaviour
             //READ THERE READ THERE READ THERE READ THERE 
             //button system is okay now but you need to find about leveling system
 
-            rb.AddForce(Vector2.up * jumpForce * rb.mass);
+            //rb.AddForce(Vector2.up * jumpForceDynm * rb.mass);
+            //jumpForceDynm = jumpForceDynm * 2 / 3;
 
-            //mp.fellCheck = false;
-            //rb.velocity = new Vector2(rb.velocity.x, 0);
-            //rb.AddForce(Vector2.up * jumpForce * rb.mass);
         }
     }
     void Turn()

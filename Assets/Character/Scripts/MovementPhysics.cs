@@ -43,6 +43,8 @@ public class MovementPhysics : MonoBehaviour
     [SerializeField] bool landingDetect = false;
     [SerializeField] bool landingTrigger;
 
+    float timer;
+
     private void Awake()
     {
         moveDir = Vector2.right;
@@ -51,7 +53,7 @@ public class MovementPhysics : MonoBehaviour
         mb = GetComponent<MovementBasic>();
         bodyCol = transform.Find("Body").GetComponent<CapsuleCollider2D>();
 
-        VariableCalc();
+        AwakeCalc();
     }
 
     private void Update()
@@ -69,14 +71,15 @@ public class MovementPhysics : MonoBehaviour
 
         LandingStabilization();
 
+        timer += Time.fixedDeltaTime;
+
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.green);
         Debug.DrawLine(transform.position, new Vector3(0, moveDir.y) + transform.position, UnityEngine.Color.red);
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, 0) + transform.position, UnityEngine.Color.blue);
         Debug.DrawLine(transform.position + new Vector3(slopeRayCenter * horInput, 0), new Vector3(slopeRayCenter * horInput, -slopeRayLen) + transform.position, UnityEngine.Color.magenta);
-
     }
 
-    void VariableCalc()
+    void AwakeCalc()
     {
         bCOverCirRad = bodyCol.size.x / 2 - 0.01F;
         bCOverCirCenter = (bodyCol.size.y - bodyCol.size.x) / 2 + 0.04F;
@@ -162,6 +165,6 @@ public class MovementPhysics : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x +"\nSin (y): " + moveDir.y);
+        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x +"\nSin (y): " + moveDir.y + "\n" + timer);
     }
 }
