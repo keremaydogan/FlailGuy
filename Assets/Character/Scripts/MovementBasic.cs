@@ -34,6 +34,9 @@ public class MovementBasic : MonoBehaviour
     [SerializeField] bool jumpInput = false;
     [SerializeField] float jumpVelo;
 
+    public float jumpForceMax;
+    [SerializeField] float jumpForceLeveled;
+
     Transform skin;
     Transform weapon;
 
@@ -51,6 +54,7 @@ public class MovementBasic : MonoBehaviour
     void AwakeCalc()
     {
         jumpVelo = Mathf.Sqrt(2 * Mathf.Abs(Physics2D.gravity.y) * rb.gravityScale * jumpHeight);
+        jumpForceLeveled = jumpForceMax;
     }
 
     void Update()
@@ -81,12 +85,13 @@ public class MovementBasic : MonoBehaviour
 
         if (jumpAllowed && Input.GetButtonDown("Jump") && !Input.GetButton("Down") && isGrounded)
         {
-            rb.velocity = new Vector2(rb.velocity.x, jumpVelo);
-
+            //rb.velocity = new Vector2(rb.velocity.x, jumpVelo);
 
             //jumpForceDynm = jumpForce;
 
-            //rb.velocity = new Vector2(rb.velocity.x, 0);
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+
+            jumpForceLeveled = jumpForceMax;
 
             jumpInput = true;
             jumpAllowed = false;
@@ -136,24 +141,27 @@ public class MovementBasic : MonoBehaviour
             if (mp.fellCheck || !Input.GetButton("Jump"))
             {
                 jumpInput = false;
+
+                //rb.gravityScale = 1.5F;
             }
 
-            //READ THERE READ THERE READ THERE READ THERE 
-            //button system is okay now but you need to find about leveling system
+            jumpForceLeveled = jumpForceLeveled / 3 * 2;
+            rb.AddForce(Vector2.up * jumpForceLeveled * -Physics2D.gravity);
 
-            //rb.AddForce(Vector2.up * jumpForceDynm * rb.mass);
-            //jumpForceDynm = jumpForceDynm * 2 / 3;
-
+            if(jumpForceLeveled < 20)
+            {
+                jumpForceLeveled = 0;
+            }
         }
     }
     void Turn()
     {
-        if (horInput == 1)
+        if (mp.faceDir == 1)
         {
             skin.localScale = Vector3.one;
             weapon.localScale = Vector3.one;
         }
-        else if (horInput == -1)
+        else if (mp.faceDir == -1)
         {
             skin.localScale = new Vector3(-1, 1, 1);
             weapon.localScale = new Vector3(-1, 1, 1);

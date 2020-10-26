@@ -1245,7 +1245,7 @@ PolygonCollider2D:
   m_GameObject: {fileID: 425227463}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: b521b702d6e3bff4082399b3a1985413, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
@@ -1418,8 +1418,8 @@ SpriteShapeRenderer:
   m_Sprites:
   - {fileID: 21300000, guid: 169e81cf6c4543548abc00ee705fae5d, type: 3}
   m_LocalAABB:
-    m_Center: {x: 2.3614006, y: 21.23403, z: -0.005}
-    m_Extent: {x: 43.14387, y: 21.23403, z: 0.005}
+    m_Center: {x: 2.3614006, y: 21.23403, z: -0.00005}
+    m_Extent: {x: 43.14387, y: 21.23403, z: 0.00005}
 --- !u!1 &474797201
 GameObject:
   m_ObjectHideFlags: 0
@@ -2720,7 +2720,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1182099054}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.6, y: 10, z: 0}
+  m_LocalPosition: {x: 31.34, y: -8.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1813046383}
@@ -4558,12 +4558,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundCheck: 0
   fellCheck: 0
+  slopeCheck: 0
   isGrounded: 0
   bCOverCirCenter: 0
   bCOverCirRad: 0
   groundLayers:
     serializedVersion: 2
     m_Bits: 512
+  facingDir: 1
   maxSlopeAngle: 45
   landingDetect: 0
   landingTrigger: 0
@@ -4625,7 +4627,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1691897946}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -12.6, y: 12, z: 0}
+  m_LocalPosition: {x: -198.4, y: 20.3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 868095343}
@@ -4679,6 +4681,8 @@ MonoBehaviour:
   jumpHeight: 8
   jumpInput: 0
   jumpVelo: 0
+  jumpForceMax: 150
+  jumpForceLeveled: 0
 --- !u!114 &1691897953
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5575,7 +5579,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2077758936}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -109.7, y: -8.5, z: -50}
+  m_LocalPosition: {x: 19.6, y: -8.5, z: -15.2}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

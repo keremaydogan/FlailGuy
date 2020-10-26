@@ -9,9 +9,6 @@ namespace Assets.Scripts
 {
     class Character : MonoBehaviour
     {
-        public string charName;
-        public float hp;
-
         private Character()
         {
 

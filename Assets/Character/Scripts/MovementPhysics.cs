@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Build;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,7 @@ public class MovementPhysics : MonoBehaviour
 
     [SerializeField] private bool groundCheck;
     public bool fellCheck;
+    [SerializeField] bool slopeCheck;
     [SerializeField] private bool isGrounded;
 
     [SerializeField] private float bCOverCirCenter;
@@ -30,6 +32,9 @@ public class MovementPhysics : MonoBehaviour
     private Vector2 moveDir;
     public Vector2 movingDir => moveDir;
 
+    [SerializeField] float facingDir = 1;
+    public float faceDir => facingDir;
+
     RaycastHit2D slopeRay;
     float slopeRayLen;
     float slopeRayCenter;
@@ -37,13 +42,11 @@ public class MovementPhysics : MonoBehaviour
     float slopeAngleDeg;
     public float maxSlopeAngle;
 
-    float brakeForce = 40;
+    float brakeForce = 60;
     float brakeCoeff = 1;
 
     [SerializeField] bool landingDetect = false;
     [SerializeField] bool landingTrigger;
-
-    float timer;
 
     private void Awake()
     {
@@ -71,7 +74,7 @@ public class MovementPhysics : MonoBehaviour
 
         LandingStabilization();
 
-        timer += Time.fixedDeltaTime;
+        FacingDir();
 
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.green);
         Debug.DrawLine(transform.position, new Vector3(0, moveDir.y) + transform.position, UnityEngine.Color.red);
@@ -103,6 +106,18 @@ public class MovementPhysics : MonoBehaviour
         else {
             moveDir = horInput * Vector2.right;
         }
+
+        if (groundCheck)
+        {
+            if (slopeAngleDeg * facingDir > maxSlopeAngle)
+            {
+                slopeCheck = false;
+            }
+            else
+            {
+                slopeCheck = true;
+            }
+        }
     }
 
     void AutoBrake()
@@ -115,21 +130,22 @@ public class MovementPhysics : MonoBehaviour
         }
 
         if (isGrounded && horInput == 0 && rb.velocity.x != 0) {
-            rb.AddForce(Vector2.left * rb.velocity * rb.mass * brakeForce * brakeCoeff);
+            rb.AddForce(-rb.velocity * brakeForce * rb.mass * brakeCoeff);
         }
+
+        //if(horInput == 0 && rb.velocity.magnitude < 0.5)
+        //{
+        //    rb.velocity = Vector2.zero;
+        //}
     }
 
     //this looks weird with no animation but maybe it'll be okay with animation
     //if you fall without jump it doesn't work
     void LandingStabilization()
     {
-        //if(detectLanding && groundCheck)
-        //{
-            
-        //}
         if (landingDetect)
         {
-            landingTrigger = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter - 0.5F), bCOverCirRad, groundLayers);
+            landingTrigger = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter - 1), 0.2F, groundLayers);
         }
         if (landingTrigger)
         {
@@ -153,7 +169,7 @@ public class MovementPhysics : MonoBehaviour
         //fellcheck is public and used by MovementBasic. You may wanna make it private. 
         //!!!!!!!!!
 
-        if (groundCheck && fellCheck)
+        if (groundCheck && fellCheck && slopeCheck)
         {
             isGrounded = true;
         }
@@ -163,8 +179,20 @@ public class MovementPhysics : MonoBehaviour
         }
     }
 
+    void FacingDir()
+    {
+        if(horInput > 0)
+        {
+            facingDir = 1;
+        }
+        else if(horInput < 0)
+        {
+            facingDir = -1;
+        }
+    }
+
     private void OnGUI()
     {
-        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x +"\nSin (y): " + moveDir.y + "\n" + timer);
+        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x +"\nSin (y): " + moveDir.y);
     }
 }
