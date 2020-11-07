@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Wall
+  - Platform
   layers:
   - Default
   - TransparentFX
@@ -16,11 +17,11 @@ TagManager:
   - 
   - 
   - Bakcground
-  - Grounds
+  - Ground
   - Char
-  - Mobs
   - 
-  - 
+  - Platform
+  - JumpD
   - 
   - 
   - 

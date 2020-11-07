@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEditor.Build;
 using UnityEditor.Experimental.GraphView;
+using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +13,7 @@ public class MovementPhysics : MonoBehaviour
 
     Rigidbody2D rb;
 
+    GameObject body;
     CapsuleCollider2D bodyCol;
 
     [SerializeField] private bool groundCheck;
@@ -37,16 +39,22 @@ public class MovementPhysics : MonoBehaviour
 
     RaycastHit2D slopeRay;
     float slopeRayLen;
-    float slopeRayCenter;
+    float slopeRayX;
     float slopeAngleRad;
     float slopeAngleDeg;
     public float maxSlopeAngle;
 
-    float brakeForce = 60;
+    float brakeForce = 40;
     float brakeCoeff = 1;
+    bool brakeAngle;
 
     [SerializeField] bool landingDetect = false;
     [SerializeField] bool landingTrigger;
+
+    [SerializeField] bool onPlatform;
+    public LayerMask platformLayer;
+    float jumpDPlatformY;
+    float jumpDOnPlatY;
 
     private void Awake()
     {
@@ -54,6 +62,7 @@ public class MovementPhysics : MonoBehaviour
 
         rb = GetComponent<Rigidbody2D>();
         mb = GetComponent<MovementBasic>();
+        body = transform.GetChild(0).gameObject;
         bodyCol = transform.Find("Body").GetComponent<CapsuleCollider2D>();
 
         AwakeCalc();
@@ -76,10 +85,12 @@ public class MovementPhysics : MonoBehaviour
 
         FacingDir();
 
+        JumpDown();
+
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.green);
         Debug.DrawLine(transform.position, new Vector3(0, moveDir.y) + transform.position, UnityEngine.Color.red);
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, 0) + transform.position, UnityEngine.Color.blue);
-        Debug.DrawLine(transform.position + new Vector3(slopeRayCenter * horInput, 0), new Vector3(slopeRayCenter * horInput, -slopeRayLen) + transform.position, UnityEngine.Color.magenta);
+        Debug.DrawLine(transform.position + new Vector3(slopeRayX * horInput, 0), new Vector3(slopeRayX * horInput, -slopeRayLen) + transform.position, UnityEngine.Color.magenta);
     }
 
     void AwakeCalc()
@@ -88,14 +99,20 @@ public class MovementPhysics : MonoBehaviour
         bCOverCirCenter = (bodyCol.size.y - bodyCol.size.x) / 2 + 0.04F;
 
         slopeRayLen = bodyCol.size.y / 2 + 0.6F;
-        slopeRayCenter = 0.2F;
+        slopeRayX = 0.2F;
 
-        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter), bCOverCirRad, groundLayers);
+        //slopeRayLen = 0.6F;
+        //slopeRayX = 0.2F;
+
+        jumpDOnPlatY = bodyCol.size.y / 2 + 0.01F;
     }
 
     void Slope()
     {
-        slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayCenter * horInput, 0), Vector2.down, slopeRayLen, groundLayers);
+        slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayX * horInput, 0), Vector2.down, slopeRayLen, groundLayers);
+
+        //slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayX * horInput, -3), Vector2.down, slopeRayLen, groundLayers);
+
         slopeAngleDeg = Vector2.SignedAngle(Vector2.up, slopeRay.normal);
         slopeAngleRad = Mathf.Deg2Rad * slopeAngleDeg;
 
@@ -118,25 +135,42 @@ public class MovementPhysics : MonoBehaviour
                 slopeCheck = true;
             }
         }
+        else
+        {
+            slopeCheck = false;
+        }
     }
 
     void AutoBrake()
     {
-        if (!mb.enabled) {
+        if (!mb.enabled)
+        {
             brakeCoeff = 1.5F;
         }
-        else {
+        else
+        {
             brakeCoeff = 1;
         }
 
-        if (isGrounded && horInput == 0 && rb.velocity.x != 0) {
+        if (isGrounded && horInput == 0 && rb.velocity.x != 0 && Vector2.Angle(Vector2.down, rb.velocity) > 10)
+        {
             rb.AddForce(-rb.velocity * brakeForce * rb.mass * brakeCoeff);
         }
+    }
 
-        //if(horInput == 0 && rb.velocity.magnitude < 0.5)
-        //{
-        //    rb.velocity = Vector2.zero;
-        //}
+    void JumpDown()
+    {
+        onPlatform = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - jumpDOnPlatY), 0.5F, platformLayer);
+
+        if (mb.jumpD && onPlatform)
+        {
+            body.layer = 13;
+            jumpDPlatformY = transform.position.y - jumpDOnPlatY;
+        }
+        if (transform.position.y > jumpDPlatformY + jumpDOnPlatY + 0.1F || transform.position.y < jumpDPlatformY)
+        {
+            body.layer = 10;
+        }
     }
 
     //this looks weird with no animation but maybe it'll be okay with animation
@@ -193,6 +227,7 @@ public class MovementPhysics : MonoBehaviour
 
     private void OnGUI()
     {
-        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x +"\nSin (y): " + moveDir.y);
+        GUI.Label(new Rect(25, 25, 100, 100), slopeAngleDeg + "\nCos (x): " + moveDir.x + "\nSin (y): " + moveDir.y);
+        GUI.Label(new Rect(130, 25, 100, 100), (jumpDPlatformY + jumpDOnPlatY + 0.1F) + "\n" + jumpDPlatformY + "\n" + transform.position.y);
     }
 }

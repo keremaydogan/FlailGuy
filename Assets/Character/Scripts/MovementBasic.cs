@@ -23,12 +23,12 @@ public class MovementBasic : MonoBehaviour
     public float walkForce;
     public float walkAirConst;
     private float walkAirCoeff;
-    public float crouchConst; 
+    public float crouchConst;
     public float runConst; //Constant 
     private float runCoeff;
     private float slopeCoeff;
     private Vector2 moveDir;
-    
+
     bool jumpAllowed;
     public float jumpHeight;
     [SerializeField] bool jumpInput = false;
@@ -36,6 +36,10 @@ public class MovementBasic : MonoBehaviour
 
     public float jumpForceMax;
     [SerializeField] float jumpForceLeveled;
+
+    bool jumpDown;
+    bool jumpDownTrigger;
+    public bool jumpD => jumpDown;
 
     Transform skin;
     Transform weapon;
@@ -64,6 +68,18 @@ public class MovementBasic : MonoBehaviour
         Turn();
 
         SlopeCoeff();
+
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (Time.timeScale == 1)
+            {
+                Time.timeScale = 0.1F;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -77,6 +93,8 @@ public class MovementBasic : MonoBehaviour
         HorizontalMove();
 
         Jump();
+
+        JumpDown();
     }
 
     void Inputs()
@@ -96,6 +114,11 @@ public class MovementBasic : MonoBehaviour
             jumpInput = true;
             jumpAllowed = false;
             mp.fellCheck = false;
+        }
+
+        if(isGrounded && Input.GetButton("Down") && Input.GetButtonDown("Jump"))
+        {
+            jumpDownTrigger = true;
         }
     }
 
@@ -154,6 +177,20 @@ public class MovementBasic : MonoBehaviour
             }
         }
     }
+
+    void JumpDown()
+    {
+        if (jumpDown)
+        {
+            jumpDown = false;
+        }
+        if (jumpDownTrigger)
+        {
+            jumpDownTrigger = false;
+            jumpDown = true;
+        }
+    }
+
     void Turn()
     {
         if (mp.faceDir == 1)
