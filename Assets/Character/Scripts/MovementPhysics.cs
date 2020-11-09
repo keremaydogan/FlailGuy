@@ -40,6 +40,7 @@ public class MovementPhysics : MonoBehaviour
     RaycastHit2D slopeRay;
     float slopeRayLen;
     float slopeRayX;
+    float slopeRayY;
     float slopeAngleRad;
     float slopeAngleDeg;
     public float maxSlopeAngle;
@@ -90,7 +91,7 @@ public class MovementPhysics : MonoBehaviour
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, moveDir.y) + transform.position, UnityEngine.Color.green);
         Debug.DrawLine(transform.position, new Vector3(0, moveDir.y) + transform.position, UnityEngine.Color.red);
         Debug.DrawLine(transform.position, new Vector3(moveDir.x, 0) + transform.position, UnityEngine.Color.blue);
-        Debug.DrawLine(transform.position + new Vector3(slopeRayX * horInput, 0), new Vector3(slopeRayX * horInput, -slopeRayLen) + transform.position, UnityEngine.Color.magenta);
+        //Debug.DrawLine(transform.position + new Vector3(slopeRayX * horInput, 0), new Vector3(slopeRayX * horInput, -slopeRayLen) + transform.position, UnityEngine.Color.magenta);
     }
 
     void AwakeCalc()
@@ -98,8 +99,8 @@ public class MovementPhysics : MonoBehaviour
         bCOverCirRad = bodyCol.size.x / 2 - 0.01F;
         bCOverCirCenter = (bodyCol.size.y - bodyCol.size.x) / 2 + 0.04F;
 
-        slopeRayLen = bodyCol.size.y / 2 + 0.6F;
-        slopeRayX = 0.2F;
+        slopeRayLen = 0.6F;
+        slopeRayY = -bodyCol.size.y / 2 + 0.1F;
 
         //slopeRayLen = 0.6F;
         //slopeRayX = 0.2F;
@@ -109,9 +110,9 @@ public class MovementPhysics : MonoBehaviour
 
     void Slope()
     {
-        slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayX * horInput, 0), Vector2.down, slopeRayLen, groundLayers);
+        slopeRayX = 0.2F * horInput;
 
-        //slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayX * horInput, -3), Vector2.down, slopeRayLen, groundLayers);
+        slopeRay = Physics2D.Raycast(transform.position + new Vector3(slopeRayX, slopeRayY), Vector2.down, slopeRayLen, groundLayers);
 
         slopeAngleDeg = Vector2.SignedAngle(Vector2.up, slopeRay.normal);
         slopeAngleRad = Mathf.Deg2Rad * slopeAngleDeg;
@@ -191,7 +192,7 @@ public class MovementPhysics : MonoBehaviour
 
     void Grounded()
     {
-        groundCheck = Physics2D.OverlapCircle(new Vector2(transform.position.x, transform.position.y - bCOverCirCenter), bCOverCirRad, groundLayers);
+        groundCheck = slopeRay;
 
         if(fellCheck == false && rb.velocity.y < 0)
         {
