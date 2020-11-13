@@ -16,9 +16,9 @@ public class MovementPhysics : MonoBehaviour
     GameObject body;
     CapsuleCollider2D bodyCol;
 
-    [SerializeField] private bool groundCheck;
+    private bool groundCheck;
     public bool fellCheck;
-    [SerializeField] bool slopeCheck;
+    bool slopeCheck;
     [SerializeField] private bool isGrounded;
 
     [SerializeField] private float bCOverCirCenter;
@@ -34,7 +34,7 @@ public class MovementPhysics : MonoBehaviour
     private Vector2 moveDir;
     public Vector2 movingDir => moveDir;
 
-    [SerializeField] float facingDir = 1;
+    float facingDir = 1;
     public float faceDir => facingDir;
 
     RaycastHit2D slopeRay;
@@ -175,7 +175,7 @@ public class MovementPhysics : MonoBehaviour
     }
 
     //this looks weird with no animation but maybe it'll be okay with animation
-    //if you fall without jump it doesn't work
+    //if you fall without jump it doesn't workc
     void LandingStabilization()
     {
         if (landingDetect)
